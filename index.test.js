@@ -1,27 +1,36 @@
-const { Builder, By, Key, until } = require('selenium-webdriver')
-require('selenium-webdriver/chrome')
-require('selenium-webdriver/firefox')
-require('chromedriver')
-require('geckodriver')
-const { querySelector } = require('./helpers')
+// https://github.com/hacklschorsch/selenium-webdriverjs-helloworld/blob/master/selenium-webdriverjs-helloworld.js
 
-const rootURL = 'https://www.mozilla.org/en-US/'
-let driver
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 60 * 5
+var webdriver = require('selenium-webdriver')
+const { Builder, Key, By } = require('selenium-webdriver')
 
-beforeAll(async () => {
-  driver = await new Builder().forBrowser('firefox').build()
-})
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 60 * 20 // 20 seconds
 
-afterAll(async () => driver.quit())
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 
-it('initialises the context', async () => {
-  await driver.get(rootURL)
-})
+it('tab through elements', async () => {
 
-it('should click on navbar button to display a drawer', async () => {
-  const anchor = await querySelector('[href=\'/en-US/firefox/\']', driver)
-  const actual = await anchor.getText()
-  const expected = 'Firefox'
-  expect(actual).toEqual(expected)
+  /*var driver = new webdriver.Builder().forBrowser('http://localhost:4444/wd/hub').withCapabilities({
+    'browserName': 'firefox',
+    'version': '',
+    'platform': 'ANY',
+    'javascriptEnabled': true
+  }).build()*/
+
+  //var driver = new Builder().forBrowser('http://localhost:4444/wd/hub').build()
+
+  var driver = await new Builder().forBrowser('firefox').build()
+  driver.get('http://www.google.com')
+  var element = driver.findElement(webdriver.By.name('q'))
+
+  for (var i = 0; i < 5; ++i) {
+    element.sendKeys(Key.TAB)
+    //element = driver.findElement(By.css('input:focus')) // select next element to tab off.
+    element = driver.switchTo().activeElement()
+
+    await sleep(2000)
+  }  
+
+  driver.quit()
 })
